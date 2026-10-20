@@ -166,6 +166,7 @@ api:
   actions:
     - action: can_send_raw_data
       variables:
+        can_id: int
         data: int[]
       then:
         - lambda: |-
@@ -178,7 +179,8 @@ api:
             std::vector<std::uint8_t> payload;
             payload.resize(data.size());
             std::transform(data.begin(),data.end(),payload.begin(),[](const auto in){ return static_cast<std::uint8_t>(in);});
-            id(wp_can).send_data(CanNode::ESPClient->canId, use_extended_id, payload);
+            const auto canId = static_cast<std::uint32_t>(can_id == 0 ? CanNode::ESPClient->canId : can_id);
+            id(wp_can).send_data(canId, use_extended_id, payload);
     - action: can_send_value
       variables:
         property: int
